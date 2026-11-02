@@ -1,0 +1,1205 @@
+<!DOCTYPE html>
+<html lang="ms">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Misi 3 - Cabaran Anggaran Masa</title>
+
+<link href="https://fonts.googleapis.com/css2?family=Outfit:wght@400;500;600;700;800;900&family=Noto+Sans+Malay:wght@400;500;600;700&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css">
+
+<style>
+:root {
+    --bg: #0f1117;
+    --bg2: #161822;
+    --card: #1c1f2e;
+    --border: #2a2e45;
+    --fg: #e8eaf0;
+    --muted: #8b90a8;
+    --accent: #f59e0b;
+    --correct: #10b981;
+    --wrong: #ef4444;
+}
+
+* {
+    margin: 0;
+    padding: 0;
+    box-sizing: border-box;
+}
+
+body {
+    font-family: 'Noto Sans Malay', sans-serif;
+    background: var(--bg);
+    color: var(--fg);
+    min-height: 100vh;
+    overflow-x: hidden;
+}
+
+/* Background */
+.bg-layer {
+    position: fixed;
+    inset: 0;
+    z-index: 0;
+    overflow: hidden;
+    pointer-events: none;
+}
+
+.bg-blob {
+    position: absolute;
+    border-radius: 50%;
+    filter: blur(120px);
+    opacity: 0.3;
+    animation: float 18s ease-in-out infinite alternate;
+}
+
+.bg-blob:nth-child(1) {
+    width: 500px;
+    height: 500px;
+    background: #f59e0b;
+    top: -10%;
+    left: -10%;
+}
+
+.bg-blob:nth-child(2) {
+    width: 400px;
+    height: 400px;
+    background: #d97706;
+    bottom: -15%;
+    right: -10%;
+}
+
+.bg-blob:nth-child(3) {
+    width: 300px;
+    height: 300px;
+    background: #92400e;
+    top: 50%;
+    left: 50%;
+}
+
+@keyframes float {
+    from { transform: translate(0,0); }
+    to { transform: translate(40px,-30px); }
+}
+
+.bg-grid {
+    position: fixed;
+    inset: 0;
+    z-index: 0;
+    pointer-events: none;
+    background-image:
+        linear-gradient(rgba(245,158,11,.03) 1px,transparent 1px),
+        linear-gradient(90deg,rgba(245,158,11,.03) 1px,transparent 1px);
+    background-size: 60px 60px;
+}
+
+/* Main container */
+.quiz-container {
+    position: relative;
+    z-index: 1;
+    max-width: 720px;
+    margin: auto;
+    padding: 40px 20px 60px;
+    min-height: 100vh;
+}
+
+/* Header */
+.quiz-header {
+    text-align: center;
+    margin-bottom: 36px;
+}
+
+.quiz-icon {
+    width: 72px;
+    height: 72px;
+    border-radius: 20px;
+    background: linear-gradient(135deg,#f59e0b,#d97706);
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 32px;
+    color: white;
+    margin-bottom: 20px;
+    box-shadow: 0 8px 32px rgba(245,158,11,.25);
+}
+
+.quiz-header h1 {
+    font-family: 'Outfit',sans-serif;
+    font-size: clamp(1.8rem,5vw,2.4rem);
+    font-weight: 800;
+    background: linear-gradient(135deg,#fff,#f59e0b);
+    -webkit-background-clip: text;
+    -webkit-text-fill-color: transparent;
+}
+
+.quiz-header p {
+    color: var(--muted);
+    font-size: .95rem;
+    margin-top: 8px;
+}
+
+/* Progress */
+.progress-bar-wrap {
+    background: var(--card);
+    border-radius: 100px;
+    height: 10px;
+    margin-bottom: 12px;
+    overflow: hidden;
+    border: 1px solid var(--border);
+}
+
+.progress-bar-fill {
+    height: 100%;
+    width: 0%;
+    background: linear-gradient(90deg,#f59e0b,#fbbf24);
+    border-radius: 100px;
+    transition: width .5s ease;
+}
+
+.progress-text {
+    text-align: right;
+    font-size: .8rem;
+    color: var(--muted);
+    margin-bottom: 28px;
+}
+
+/* Question card */
+.question-card {
+    background: var(--card);
+    border: 1px solid var(--border);
+    border-radius: 16px;
+    padding: 32px 28px;
+    animation: cardIn .4s ease;
+}
+
+@keyframes cardIn {
+    from {
+        opacity: 0;
+        transform: translateY(20px);
+    }
+    to {
+        opacity: 1;
+        transform: translateY(0);
+    }
+}
+
+.question-number {
+    display: inline-block;
+    background: rgba(245,158,11,.08);
+    border: 1px solid rgba(245,158,11,.2);
+    color: var(--accent);
+    font-weight: 700;
+    font-size: .8rem;
+    padding: 6px 14px;
+    border-radius: 100px;
+    margin-bottom: 18px;
+}
+
+.question-text {
+    font-size: 1.1rem;
+    line-height: 1.75;
+    margin-bottom: 28px;
+}
+
+/* Options */
+.options-list {
+    display: flex;
+    flex-direction: column;
+    gap: 12px;
+}
+
+.option-btn {
+    display: flex;
+    align-items: center;
+    gap: 14px;
+    width: 100%;
+    text-align: left;
+    background: var(--bg2);
+    border: 1.5px solid var(--border);
+    border-radius: 10px;
+    padding: 16px 20px;
+    cursor: pointer;
+    color: var(--fg);
+    font-size: .98rem;
+    font-family: inherit;
+    transition: all .25s ease;
+}
+
+.option-btn:hover:not(.disabled) {
+    border-color: var(--accent);
+    transform: translateX(4px);
+}
+
+.option-letter {
+    flex-shrink: 0;
+    width: 36px;
+    height: 36px;
+    border-radius: 10px;
+    background: var(--card);
+    border: 1px solid var(--border);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-weight: 700;
+    color: var(--muted);
+}
+
+.option-text {
+    line-height: 1.5;
+}
+
+.option-icon {
+    margin-left: auto;
+}
+
+.option-btn.correct {
+    border-color: var(--correct);
+    background: rgba(16,185,129,.1);
+}
+
+.option-btn.correct .option-letter {
+    background: var(--correct);
+    color: white;
+}
+
+.option-btn.wrong {
+    border-color: var(--wrong);
+    background: rgba(239,68,68,.1);
+}
+
+.option-btn.wrong .option-letter {
+    background: var(--wrong);
+    color: white;
+}
+
+.option-btn.disabled {
+    cursor: default;
+    opacity: .5;
+}
+
+.option-btn.correct,
+.option-btn.wrong {
+    opacity: 1;
+}
+
+/* Feedback */
+.feedback {
+    display: none;
+    margin-top: 22px;
+    padding: 16px 20px;
+    border-radius: 10px;
+    font-size: .92rem;
+    line-height: 1.7;
+}
+
+.feedback.correct-fb {
+    display: block;
+    background: rgba(16,185,129,.1);
+    border: 1px solid rgba(16,185,129,.4);
+    color: #6ee7b7;
+}
+
+.feedback.wrong-fb {
+    display: block;
+    background: rgba(239,68,68,.1);
+    border: 1px solid rgba(239,68,68,.4);
+    color: #fca5a5;
+}
+
+.feedback strong {
+    display: block;
+    margin-bottom: 6px;
+}
+
+/* Next button */
+.next-btn-wrap {
+    margin-top: 28px;
+    display: flex;
+    justify-content: flex-end;
+}
+
+.next-btn {
+    display: none;
+    align-items: center;
+    gap: 10px;
+    padding: 14px 32px;
+    border-radius: 100px;
+    border: none;
+    background: linear-gradient(135deg,#f59e0b,#d97706);
+    color: #000;
+    font-weight: 700;
+    font-size: .95rem;
+    cursor: pointer;
+}
+
+.next-btn.show {
+    display: inline-flex;
+}
+
+.next-btn:hover {
+    transform: translateY(-2px);
+}
+
+/* Results */
+.result-screen {
+    display: none;
+    text-align: center;
+    animation: cardIn .5s ease;
+}
+
+.result-screen.show {
+    display: block;
+}
+
+.result-circle {
+    width: 180px;
+    height: 180px;
+    margin: 0 auto 28px;
+    position: relative;
+}
+
+.result-circle svg {
+    width: 100%;
+    height: 100%;
+    transform: rotate(-90deg);
+}
+
+.result-circle .track {
+    fill: none;
+    stroke: var(--border);
+    stroke-width: 8;
+}
+
+.result-circle .fill-ring {
+    fill: none;
+    stroke-width: 8;
+    stroke-linecap: round;
+    transition: stroke-dashoffset 1.5s ease;
+}
+
+.score-text {
+    position: absolute;
+    inset: 0;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+}
+
+.score-num {
+    font-family: 'Outfit',sans-serif;
+    font-size: 3rem;
+    font-weight: 900;
+}
+
+.score-label {
+    font-size: .8rem;
+    color: var(--muted);
+}
+
+.result-title {
+    font-family: 'Outfit',sans-serif;
+    font-size: 1.8rem;
+    margin-bottom: 10px;
+}
+
+.result-desc {
+    color: var(--muted);
+    font-size: .95rem;
+    line-height: 1.6;
+    max-width: 480px;
+    margin: 0 auto 32px;
+}
+
+.result-stats {
+    display: grid;
+    grid-template-columns: repeat(3,1fr);
+    gap: 12px;
+    margin-bottom: 36px;
+}
+
+.stat-card {
+    background: var(--card);
+    border: 1px solid var(--border);
+    border-radius: 10px;
+    padding: 18px 12px;
+}
+
+.stat-icon {
+    font-size: 1.3rem;
+    margin-bottom: 8px;
+}
+
+.stat-val {
+    font-family: 'Outfit',sans-serif;
+    font-size: 1.6rem;
+    font-weight: 800;
+}
+
+.stat-lbl {
+    font-size: .75rem;
+    color: var(--muted);
+}
+
+.correct-stat { color: var(--correct); }
+.wrong-stat { color: var(--wrong); }
+.total-stat { color: var(--accent); }
+
+/* Review */
+.review-section {
+    text-align: left;
+    margin-top: 12px;
+}
+
+.review-title {
+    font-size: 1.1rem;
+    font-weight: 700;
+    margin-bottom: 16px;
+    color: var(--muted);
+}
+
+.review-item {
+    background: var(--card);
+    border: 1px solid var(--border);
+    border-radius: 10px;
+    padding: 18px 20px;
+    margin-bottom: 10px;
+}
+
+.review-item-header {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    margin-bottom: 8px;
+}
+
+.review-badge {
+    width: 28px;
+    height: 28px;
+    border-radius: 8px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    color: white;
+}
+
+.r-correct { background: var(--correct); }
+.r-wrong { background: var(--wrong); }
+
+.review-q-text {
+    font-size: .88rem;
+    color: var(--muted);
+    line-height: 1.5;
+}
+
+.review-answer {
+    font-size: .85rem;
+    margin-top: 8px;
+    padding-left: 38px;
+    line-height: 1.6;
+}
+
+.your-ans { color: var(--wrong); }
+.correct-ans { color: var(--correct); }
+
+/* Restart */
+.restart-btn {
+    display: inline-flex;
+    align-items: center;
+    gap: 10px;
+    padding: 16px 40px;
+    border-radius: 100px;
+    border: 2px solid var(--accent);
+    background: transparent;
+    color: var(--accent);
+    font-weight: 700;
+    font-size: 1rem;
+    cursor: pointer;
+    margin-top: 32px;
+    font-family: inherit;
+}
+
+.restart-btn:hover {
+    background: var(--accent);
+    color: #000;
+}
+
+@media(max-width:600px) {
+    .quiz-container {
+        padding: 24px 14px 40px;
+    }
+
+    .question-card {
+        padding: 24px 18px;
+    }
+
+    .option-btn {
+        padding: 14px 16px;
+        font-size: .92rem;
+    }
+
+    .result-stats {
+        gap: 8px;
+    }
+
+    .stat-card {
+        padding: 14px 8px;
+    }
+
+    .stat-val {
+        font-size: 1.3rem;
+    }
+}
+</style>
+</head>
+
+<body>
+
+<div class="bg-layer">
+    <div class="bg-blob"></div>
+    <div class="bg-blob"></div>
+    <div class="bg-blob"></div>
+</div>
+
+<div class="bg-grid"></div>
+
+<main class="quiz-container">
+
+    <header class="quiz-header">
+        <div class="quiz-icon">
+            <i class="fa-solid fa-clock"></i>
+        </div>
+
+        <h1>MISI 3: CABARAN ANGGARAN MASA</h1>
+        <p>Cabaran Time Master – Anggar dan Buktikan!</p>
+    </header>
+
+    <div class="progress-bar-wrap">
+        <div class="progress-bar-fill" id="progressFill"></div>
+    </div>
+
+    <div class="progress-text" id="progressText">
+        Soalan 1 / 5
+    </div>
+
+    <div id="quizContent"></div>
+
+    <!-- Result screen -->
+    <div class="result-screen" id="resultScreen">
+
+        <div class="result-circle">
+            <svg viewBox="0 0 200 200">
+                <circle class="track" cx="100" cy="100" r="85"></circle>
+
+                <circle
+                    class="fill-ring"
+                    id="resultRing"
+                    cx="100"
+                    cy="100"
+                    r="85"
+                    stroke-dasharray="534.07"
+                    stroke-dashoffset="534.07">
+                </circle>
+            </svg>
+
+            <div class="score-text">
+                <span class="score-num" id="resultScoreNum">0</span>
+                <span class="score-label">daripada 5</span>
+            </div>
+        </div>
+
+        <h2 class="result-title" id="resultTitle">--</h2>
+        <p class="result-desc" id="resultDesc">--</p>
+
+        <div class="result-stats">
+
+            <div class="stat-card correct-stat">
+                <div class="stat-icon">
+                    <i class="fa-solid fa-circle-check"></i>
+                </div>
+                <div class="stat-val" id="statCorrect">0</div>
+                <div class="stat-lbl">Betul</div>
+            </div>
+
+            <div class="stat-card wrong-stat">
+                <div class="stat-icon">
+                    <i class="fa-solid fa-circle-xmark"></i>
+                </div>
+                <div class="stat-val" id="statWrong">0</div>
+                <div class="stat-lbl">Salah</div>
+            </div>
+
+            <div class="stat-card total-stat">
+                <div class="stat-icon">
+                    <i class="fa-solid fa-list-check"></i>
+                </div>
+                <div class="stat-val">5</div>
+                <div class="stat-lbl">Jumlah</div>
+            </div>
+
+        </div>
+
+        <div class="review-section">
+            <div class="review-title">Semakan Jawapan</div>
+            <div id="reviewList"></div>
+        </div>
+
+        <button class="restart-btn" id="restartBtn">
+            <i class="fa-solid fa-rotate-right"></i>
+            Mula Semula
+        </button>
+
+    </div>
+
+</main>
+
+<script>
+
+/* ============================================
+   DATA KUIZ — 5 SOALAN
+============================================ */
+
+const quizData = [
+
+    {
+        question: "Puan Aina membungkus 300 peket kerepek dalam masa hampir 5 jam. Dia perlu membungkus 2 100 peket. Apakah anggaran masa yang paling munasabah?",
+
+        options: [
+            "Kurang daripada 5 jam",
+            "Lebih lama daripada 5 jam",
+            "Tepat 5 jam",
+            "Tidak memerlukan masa"
+        ],
+
+        correct: 1,
+
+        explanation: "Bilangan peket yang perlu dibungkus ialah 2 100, iaitu lebih banyak daripada 300 peket. Oleh itu, masa yang diperlukan dijangka lebih lama daripada 5 jam. Anggaran masa juga bergantung pada kelajuan dan keadaan semasa aktiviti membungkus dijalankan."
+    },
+
+    {
+        question: "Puan Aina membungkus 300 peket kerepek dalam masa hampir 5 jam. Dia perlu membungkus 150 peket. Apakah anggaran masa yang paling munasabah?",
+
+        options: [
+            "Lebih lama daripada 5 jam",
+            "Lebih singkat daripada 5 jam",
+            "Tepat 5 jam",
+            "Tidak memerlukan masa"
+        ],
+
+        correct: 1,
+
+        explanation: "Bilangan peket yang perlu dibungkus ialah 150, iaitu kurang daripada 300 peket. Oleh itu, masa yang diperlukan dijangka lebih singkat daripada 5 jam. Maklumat 300 peket dalam hampir 5 jam digunakan sebagai set rujukan untuk membuat anggaran."
+    },
+
+    {
+        question: "Abang menghasilkan 2 origami dalam masa lebih kurang 10 minit. Dia ingin menghasilkan 15 origami. Apakah anggaran masa yang paling munasabah?",
+
+        options: [
+            "Kurang daripada 10 minit",
+            "Tepat 10 minit",
+            "Lebih daripada 10 minit",
+            "Tidak memerlukan masa"
+        ],
+
+        correct: 2,
+
+        explanation: "Menghasilkan 15 origami memerlukan lebih banyak masa berbanding menghasilkan 2 origami. Oleh itu, masa yang diperlukan dijangka lebih daripada 10 minit. Pengalaman menghasilkan origami boleh digunakan sebagai panduan untuk membuat anggaran yang munasabah."
+    },
+
+    {
+        question: "Abang menghasilkan 2 origami dalam masa lebih kurang 10 minit. Apakah kombinasi tindakan yang sesuai untuk mendapatkan anggaran dan masa sebenar bagi menghasilkan 10 origami?",
+
+        options: [
+            "Gunakan jam randik, gunakan 2 origami dalam 10 minit sebagai set rujukan, dan buat anggaran sebelum aktiviti.",
+            "Gunakan jam randik sahaja.",
+            "Anggap masa sebenar mesti sama dengan anggaran.",
+            "Buat anggaran selepas aktiviti sahaja."
+        ],
+
+        correct: 0,
+
+        explanation: "Jawapan yang betul merangkumi tiga tindakan: gunakan maklumat 2 origami dalam 10 minit sebagai set rujukan, buat anggaran sebelum memulakan aktiviti, dan gunakan jam randik untuk merekodkan masa sebenar. Kemudian, bandingkan masa anggaran dengan masa sebenar. Anggaran tidak semestinya sama dengan masa sebenar kerana kelajuan setiap orang mungkin berbeza."
+    },
+
+    {
+        question: "Anggaran masa bagi aktiviti menghasilkan origami mestilah sama tepat dengan masa sebenar yang direkodkan menggunakan jam randik.",
+
+        options: [
+            "Betul",
+            "Salah"
+        ],
+
+        correct: 1,
+
+        explanation: "Pernyataan ini salah. Anggaran masa ialah jangkaan berdasarkan maklumat atau pengalaman, manakala masa sebenar diperoleh melalui pengukuran menggunakan jam randik. Contohnya, anggaran untuk menghasilkan 10 origami ialah 40 minit, tetapi masa sebenar ialah 45 minit. Perbezaan ini adalah normal."
+    }
+
+];
+
+
+/* ============================================
+   VARIABLES
+============================================ */
+
+const letters = ['A', 'B', 'C', 'D'];
+
+let currentQ = 0;
+let score = 0;
+let answers = [];
+let answered = false;
+
+
+/* ============================================
+   DOM ELEMENTS
+============================================ */
+
+const quizContent = document.getElementById('quizContent');
+const progressFill = document.getElementById('progressFill');
+const progressText = document.getElementById('progressText');
+
+const resultScreen = document.getElementById('resultScreen');
+const resultRing = document.getElementById('resultRing');
+const resultScoreNum = document.getElementById('resultScoreNum');
+const resultTitle = document.getElementById('resultTitle');
+const resultDesc = document.getElementById('resultDesc');
+
+const statCorrect = document.getElementById('statCorrect');
+const statWrong = document.getElementById('statWrong');
+
+const reviewList = document.getElementById('reviewList');
+const restartBtn = document.getElementById('restartBtn');
+
+
+/* ============================================
+   DISPLAY QUESTION
+============================================ */
+
+function renderQuestion() {
+
+    answered = false;
+
+    const q = quizData[currentQ];
+
+    const pct = (currentQ / quizData.length) * 100;
+
+    progressFill.style.width = pct + '%';
+
+    progressText.textContent =
+        `Soalan ${currentQ + 1} / ${quizData.length}`;
+
+    let optionsHTML = '';
+
+    q.options.forEach((opt, i) => {
+
+        optionsHTML += `
+            <button class="option-btn" data-index="${i}">
+
+                <span class="option-letter">
+                    ${letters[i]}
+                </span>
+
+                <span class="option-text">
+                    ${opt}
+                </span>
+
+                <span class="option-icon"></span>
+
+            </button>
+        `;
+
+    });
+
+    quizContent.innerHTML = `
+
+        <article class="question-card">
+
+            <div class="question-number">
+                <i class="fa-solid fa-bookmark"></i>
+                Soalan ${currentQ + 1}
+            </div>
+
+            <p class="question-text">
+                ${q.question}
+            </p>
+
+            <div class="options-list">
+                ${optionsHTML}
+            </div>
+
+            <div class="feedback" id="feedback"></div>
+
+            <div class="next-btn-wrap">
+
+                <button class="next-btn" id="nextBtn">
+
+                    ${currentQ < quizData.length - 1
+                        ? 'Seterusnya'
+                        : 'Lihat Keputusan'}
+
+                    <i class="fa-solid fa-arrow-right"></i>
+
+                </button>
+
+            </div>
+
+        </article>
+
+    `;
+
+    document.querySelectorAll('.option-btn').forEach(btn => {
+
+        btn.addEventListener('click', () => {
+
+            handleAnswer(parseInt(btn.dataset.index));
+
+        });
+
+    });
+
+    document.getElementById('nextBtn')
+        .addEventListener('click', nextQuestion);
+
+}
+
+
+/* ============================================
+   CHECK ANSWER
+============================================ */
+
+function handleAnswer(selected) {
+
+    if (answered) return;
+
+    answered = true;
+
+    const q = quizData[currentQ];
+
+    const isCorrect = selected === q.correct;
+
+    const buttons = document.querySelectorAll('.option-btn');
+
+    const feedback = document.getElementById('feedback');
+
+    const nextBtn = document.getElementById('nextBtn');
+
+    answers[currentQ] = selected;
+
+    if (isCorrect) {
+        score++;
+    }
+
+    buttons.forEach((btn, i) => {
+
+        btn.classList.add('disabled');
+
+        const icon = btn.querySelector('.option-icon');
+
+        if (i === q.correct) {
+
+            btn.classList.remove('disabled');
+            btn.classList.add('correct');
+
+            icon.innerHTML =
+                '<i class="fa-solid fa-circle-check"></i>';
+
+        }
+
+        if (i === selected && !isCorrect) {
+
+            btn.classList.remove('disabled');
+            btn.classList.add('wrong');
+
+            icon.innerHTML =
+                '<i class="fa-solid fa-circle-xmark"></i>';
+
+        }
+
+    });
+
+    if (isCorrect) {
+
+        feedback.className = 'feedback correct-fb';
+
+        feedback.innerHTML = `
+            <strong>
+                <i class="fa-solid fa-sparkles"></i>
+                Tepat!
+            </strong>
+
+            ${q.explanation}
+        `;
+
+    } else {
+
+        feedback.className = 'feedback wrong-fb';
+
+        feedback.innerHTML = `
+            <strong>
+                <i class="fa-solid fa-triangle-exclamation"></i>
+                Tidak tepat
+            </strong>
+
+            ${q.explanation}
+        `;
+
+    }
+
+    nextBtn.classList.add('show');
+
+    const pct = ((currentQ + 1) / quizData.length) * 100;
+
+    progressFill.style.width = pct + '%';
+
+}
+
+
+/* ============================================
+   NEXT QUESTION
+============================================ */
+
+function nextQuestion() {
+
+    currentQ++;
+
+    if (currentQ >= quizData.length) {
+
+        showResult();
+
+    } else {
+
+        renderQuestion();
+
+        window.scrollTo({
+            top: 0,
+            behavior: 'smooth'
+        });
+
+    }
+
+}
+
+
+/* ============================================
+   SHOW RESULT
+============================================ */
+
+function showResult() {
+
+    quizContent.innerHTML = '';
+
+    progressFill.style.width = '100%';
+
+    progressText.textContent = 'Kuiz Selesai';
+
+    const wrong = quizData.length - score;
+
+    const pct = score / quizData.length;
+
+    const circumference = 2 * Math.PI * 85;
+
+    const offset = circumference * (1 - pct);
+
+    let ringColor;
+
+    if (pct >= 0.8) {
+        ringColor = 'var(--correct)';
+    } else if (pct >= 0.5) {
+        ringColor = 'var(--accent)';
+    } else {
+        ringColor = 'var(--wrong)';
+    }
+
+    resultRing.style.stroke = ringColor;
+
+    resultRing.style.strokeDashoffset = circumference;
+
+    requestAnimationFrame(() => {
+
+        resultRing.style.strokeDashoffset = offset;
+
+    });
+
+    resultScoreNum.textContent = score;
+
+    resultScoreNum.style.color = ringColor;
+
+
+    /* Result description */
+
+    if (pct === 1) {
+
+        resultTitle.textContent = 'Sempurna!';
+
+        resultDesc.textContent =
+            'Kesemua jawapan anda tepat. Anda menguasai kemahiran membuat anggaran masa dan membandingkannya dengan masa sebenar dengan sangat baik.';
+
+    } else if (pct >= 0.75) {
+
+        resultTitle.textContent = 'Hebat!';
+
+        resultDesc.textContent =
+            'Prestasi cemerlang! Anda hampir menguasai kemahiran menganggar dan mengukur masa. Teruskan usaha.';
+
+    } else if (pct >= 0.5) {
+
+        resultTitle.textContent = 'Baik';
+
+        resultDesc.textContent =
+            'Anda mempunyai asas yang baik. Semak semula cara menggunakan set rujukan dan jam randik untuk membuat penambahbaikan.';
+
+    } else {
+
+        resultTitle.textContent = 'Teruskan Mencuba';
+
+        resultDesc.textContent =
+            'Jangan berputus asa. Teruskan berlatih membuat anggaran masa, menggunakan jam randik dan membandingkan masa anggaran dengan masa sebenar.';
+
+    }
+
+    statCorrect.textContent = score;
+
+    statWrong.textContent = wrong;
+
+
+    /* Answer review */
+
+    let reviewHTML = '';
+
+    quizData.forEach((q, i) => {
+
+        const userAns = answers[i];
+
+        const isCorrect = userAns === q.correct;
+
+        const badgeClass = isCorrect
+            ? 'r-correct'
+            : 'r-wrong';
+
+        const badgeIcon = isCorrect
+            ? '<i class="fa-solid fa-check"></i>'
+            : '<i class="fa-solid fa-xmark"></i>';
+
+        let answerDetail = '';
+
+        if (isCorrect) {
+
+            answerDetail = `
+
+                <div class="review-answer">
+
+                    <span class="correct-ans">
+
+                        <i class="fa-solid fa-circle-check"></i>
+
+                        ${letters[q.correct]}.
+                        ${q.options[q.correct]}
+
+                    </span>
+
+                </div>
+
+            `;
+
+        } else {
+
+            answerDetail = `
+
+                <div class="review-answer">
+
+                    <div class="your-ans">
+
+                        <i class="fa-solid fa-circle-xmark"></i>
+
+                        Jawapan anda:
+                        ${letters[userAns]}. ${q.options[userAns]}
+
+                    </div>
+
+                    <div class="correct-ans">
+
+                        <i class="fa-solid fa-circle-check"></i>
+
+                        Jawapan betul:
+                        ${letters[q.correct]}. ${q.options[q.correct]}
+
+                    </div>
+
+                </div>
+
+            `;
+
+        }
+
+        reviewHTML += `
+
+            <div class="review-item">
+
+                <div class="review-item-header">
+
+                    <div class="review-badge ${badgeClass}">
+                        ${badgeIcon}
+                    </div>
+
+                    <span>
+                        Soalan ${i + 1}
+                    </span>
+
+                </div>
+
+                <div class="review-q-text">
+                    ${q.question}
+                </div>
+
+                ${answerDetail}
+
+            </div>
+
+        `;
+
+    });
+
+    reviewList.innerHTML = reviewHTML;
+
+    resultScreen.classList.add('show');
+
+    window.scrollTo({
+        top: 0,
+        behavior: 'smooth'
+    });
+
+}
+
+
+/* ============================================
+   RESTART QUIZ
+============================================ */
+
+restartBtn.addEventListener('click', () => {
+
+    currentQ = 0;
+
+    score = 0;
+
+    answers = [];
+
+    resultScreen.classList.remove('show');
+
+    renderQuestion();
+
+    window.scrollTo({
+        top: 0,
+        behavior: 'smooth'
+    });
+
+});
+
+
+/* ============================================
+   START QUIZ
+============================================ */
+
+renderQuestion();
+
+</script>
+
+</body>
+</html>
